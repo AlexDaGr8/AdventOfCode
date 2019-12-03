@@ -103,7 +103,34 @@ let data = [
 
 let fuelByMass = (mass) => Math.floor(mass / 3) - 2;
 
-let answer = data.reduce((acc, cur) => acc + fuelByMass(cur), 0);
-
 let dayOne = document.getElementById('day-one');
-dayOne.innerText = answer;
+
+// Day one part 1
+let answer = data.reduce((acc, cur) => acc + fuelByMass(cur), 0);
+let part1Label = document.createElement('h3');
+part1Label.innerText = 'Part 1'
+let part1 = document.createElement('span');
+part1.innerText = answer;
+dayOne.appendChild(part1Label);
+dayOne.appendChild(part1);
+
+
+let extraFuel = (fuel) => {
+    let acc = 0;
+    while ((fuel = fuelByMass(fuel)) > 0) {
+        acc += fuel;
+    }
+    return acc;
+}
+
+// Day one part 2
+let answer2 = data.reduce((acc, cur) => {
+    //while ()
+    return acc + extraFuel(cur);
+}, 0);
+let part2Label = document.createElement('h3');
+part2Label.innerText = 'Part 2'
+let part2 = document.createElement('span');
+part2.innerText = answer2;
+dayOne.appendChild(part2Label);
+dayOne.appendChild(part2);
