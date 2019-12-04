@@ -2,9 +2,29 @@ let dataDayTwo = [1,0,0,3,1,1,2,3,1,3,4,3,1,5,0,3,2,9,1,19,1,9,19,23,1,23,5,27,2
 let div = document.getElementById('day-two');
 let result = [];
 
-result.push(program(dataDayTwo, 12, 2));
+const target = 19690720;
+var noun = 30, verb = 0;
+var testVal = programLess(dataDayTwo, noun, verb) 
+// while (testVal < target) {
+//     console.log('noun', noun)
+//     console.log('testVal', testVal )
+//     testVal = programLess(dataDayTwo, noun++, verb)
+// }
+
+result.push(program(dataDayTwo, 40, 19) + '<br>');
+result.push('19690720<br>');
 
 div.innerHTML = result.join('');
+
+
+
+let part2DayTwo = document.createElement('div');
+let part2Result = [];
+part2Result.push('noun - ' + noun + '<br>');
+part2Result.push('verb - ' + verb + '<br>');
+part2Result.push('answer - ' + (100 * noun + verb) + '<br>');
+part2DayTwo.innerHTML = part2Result.join('');
+div.appendChild(part2DayTwo);
 
 function program(d, noun, verb) {
     d[1] = noun;
@@ -21,11 +41,21 @@ function program(d, noun, verb) {
         vizD[slice[2]] = '<b class="purple">' + vizD[slice[2]] + '</b>';
         vizD[ct.position] = '<b class="blue">' + vizD[ct.position] + '</b>';
         result.push(vizD + '<br>');
-        result.push('<br>');
         i += 4;
     }
     result.push('<b class="green">' + d[0] % (100 * noun + verb) + '</b><br>')
     result.push('<b class="purple">' + (100 * noun + verb) + '</b><br>')
+    return d[0];
+}
+function programLess(d, noun, verb) {
+    d[1] = noun;
+    d[2] = verb;
+    let i = 0;
+    while (d[i] !== 99) {
+        var ct = checkType(d.slice(i, i + 4) , d);
+        d[ct.position] = ct.value;
+        i += 4;
+    }
     return d[0];
 }
 
