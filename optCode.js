@@ -56,6 +56,8 @@ optCode.prototype.run = function() {
                 this.output.push(this.instr[op[1]]); 
             }
             i += 2;
+        } else {
+
         }
         console.log(this.instr);
         console.log('i', i);
