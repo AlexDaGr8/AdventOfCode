@@ -30,28 +30,59 @@ function Orbits(input) {
 
 function testOrbit (input) {
     this.orbitsInput = input.split("\n");
-    this.graph = new Graph();
+    
     this.orbitPairs = this.orbitsInput.map(orbit => {
         let pair = orbit.split(')');
         return {
             orbitee: pair[0],
             orbiter: pair[1]
         }
-    })
+    });
+
+    this.linkLists = [];
+    this.currLL = null;
+
     this.orbits = new LinkedList();
     this.orbits.add("COM");
     this.linkedList = this.orbits;
     console.log(this.orbitPairs)
-    this.formatOrbits();
-    console.log(this.orbits)
-    console.log('linkedList', this.linkedList)
-    console.log(this.orbits.getById(1))
-    console.log(this.orbits.getByData("B"))
+    this.formatOrbit();
+
+    console.log('lts', this.linkLists)
+    // console.log(this.orbits)
+    // console.log('linkedList', this.linkedList)
+    // console.log(this.orbits.getById(1))
+    // console.log(this.orbits.getByData("B"))
 }
 
-testOrbit.prototype.formatOrbits = function() {
+testOrbit.prototype.formatOrbit = function() {
     let com = this.orbitPairs.find(d => d.orbitee === "COM");
-    console.log('all', this.findAll(com.orbiter))
+    console.log('all', this.findAllBreak("COM"));
+}
+
+testOrbit.prototype.findAllBreak = function (orbit) {
+    console.log('orbit', orbit)
+    if (this.currLL === null) {
+        this.currLL = new LinkedList();
+        this.currLL.add(orbit);
+    }
+    let filter = this.orbitPairs.filter(d => d.orbitee === orbit);
+    for (let f of filter) {
+        this.currLL.add(f.orbiter)
+        console.log('f', f);
+        console.log(this.findAllBreak(f.orbiter))
+        break; 
+    }
+    console.log('orbit', orbit)
+    if (orbit === "COM") {
+        this.linkLists.push(this.currLL);
+        this.currLL = null;
+    }
+    return 'done';
+}
+
+testOrbit.prototype.findInLinkedLists = function () {
+
 }
 
 testOrbit.prototype.findAll = function (orbit, id = null) {

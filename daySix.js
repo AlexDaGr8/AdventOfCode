@@ -1,4 +1,4 @@
-let orbits = new Orbits(`COM)B
+let teststr = `COM)B
 B)C
 C)D
 D)E
@@ -8,4 +8,8 @@ G)H
 D)I
 E)J
 J)K
-K)L`)
+K)L`;
+
+//let orbits = new Orbits(teststr);
+
+let testOrbits = new testOrbit(teststr);
