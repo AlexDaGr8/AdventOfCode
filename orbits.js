@@ -1,5 +1,36 @@
-function Orbits (input) {
+function Orbits(input) {
     this.orbitsInput = input.split("\n");
+    this.graph = new Graph();
+    this.orbitPairs = this.orbitsInput.map(orbit => {
+        let pair = orbit.split(')');
+        return [
+            pair[0],
+            pair[1]
+        ]
+    });
+    this.uniqueNodes = [...new Set(this.orbitPairs.flat())];
+
+    this.uniqueNodes.forEach(node => {
+        this.graph.addNode(node);
+    })
+
+    this.orbitPairs.forEach(pair => {
+        this.graph.addDirectedEdge(pair[0], pair[1])
+    })
+
+    this.graph.display();
+
+    console.log('pairs', this.orbitPairs)
+    console.log('unique', [...new Set(this.orbitPairs.flat())])
+
+    
+}
+
+
+
+function testOrbit (input) {
+    this.orbitsInput = input.split("\n");
+    this.graph = new Graph();
     this.orbitPairs = this.orbitsInput.map(orbit => {
         let pair = orbit.split(')');
         return {
@@ -18,12 +49,12 @@ function Orbits (input) {
     console.log(this.orbits.getByData("B"))
 }
 
-Orbits.prototype.formatOrbits = function() {
+testOrbit.prototype.formatOrbits = function() {
     let com = this.orbitPairs.find(d => d.orbitee === "COM");
     console.log('all', this.findAll(com.orbiter))
 }
 
-Orbits.prototype.findAll = function (orbit, id = null) {
+testOrbit.prototype.findAll = function (orbit, id = null) {
     let arr = [];
     let filter = this.orbitPairs.filter(d => d.orbitee === orbit);
     console.log('filter', filter);
