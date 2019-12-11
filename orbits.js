@@ -15,15 +15,14 @@ function Orbits(input) {
     })
 
     this.orbitPairs.forEach(pair => {
-        this.graph.addDirectedEdge(pair[0], pair[1])
+        this.graph.addEdge(pair[0], pair[1])
     })
 
     this.graph.display();
+    this.graph.setStepsFromStartPoint("COM", true)
 
-    console.log('pairs', this.orbitPairs)
-    console.log('unique', [...new Set(this.orbitPairs.flat())])
-
-    
+    console.log('steps', this.graph.steps);
+    console.log('total steps', this.graph.getTotalSteps())
 }
 
 
