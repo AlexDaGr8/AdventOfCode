@@ -1,9 +1,12 @@
 
-function optCode(instructionsStr, input, noun, verb) {
+function optCode(instructionsStr, input, phase, noun, verb) {
     this.instr = instructionsStr.split(',').map(d => +d);
     this.noun = noun;
     this.verb = verb;
     this.input = input;
+    this.inputUsed = false;
+    this.phase = phase;
+    this.phaseUsed = false;
     this.output = [];
     this.answer = 0;
 
@@ -15,19 +18,11 @@ function optCode(instructionsStr, input, noun, verb) {
     this.runTest();
 }
 
-optCode.prototype.immediate = function() {
-
-}
-
-optCode.prototype.position = function() {
-
-}
-
 optCode.prototype.checkType = function(partialArr) {
     let value = 0, position = partialArr[partialArr.length - 1];
     let params = partialArr.slice(1, partialArr.length - 1);
     let jump = false;
-    console.log('params', params)
+    //console.log('params', params)
     switch (partialArr[0]) {
         case 1: 
             value = params.reduce((acc,curr) => acc + curr, 0);
@@ -39,7 +34,12 @@ optCode.prototype.checkType = function(partialArr) {
             break;
         case 3:
             value = 'input'
-            this.instr[position] = this.input;
+            this.instr[position] = this.phaseUsed ? this.input : this.phase;
+            this.phaseUsed = true;
+            // console.log(this.phaseUsed);
+            // console.log('phase', this.phase);
+            // console.log('input', this.input);
+            // console.log('at pos', this.instr[position])
             break;
         case 4:
             value = position;
@@ -78,12 +78,12 @@ optCode.prototype.runTest = function() {
     var i = 0;
     while (this.instr[i] !== 99 && i < this.instr.length) {
         let code = (this.instr[i] + "");
-        console.log('code', code);
+        //console.log('code', code);
 
         let splitCode = code.split('').map(d => +d);
         let firstVal = splitCode[splitCode.length - 1];
-        console.log(firstVal)
-        console.log([3,4].some(d => d === firstVal))
+        // console.log(firstVal)
+        // console.log([3,4].some(d => d === firstVal))
         let opC = [3,4].some(d => d === firstVal) 
             ? this.instr.slice(i, i += 2) 
             : [5,6].some(d => d === firstVal) 
@@ -91,37 +91,37 @@ optCode.prototype.runTest = function() {
                 : this.instr.slice(i, i += 4);
         opC[0] = firstVal;
         let revSplitCodeParamMode = splitCode.slice(0,splitCode.length - 2).reverse();
-        console.log('opC', opC.slice())
-        console.log('revSplitCode', revSplitCodeParamMode)
-        console.log('opC.slice(1,opC.length - 1)', opC.slice(1,[5,6].some(d => d === firstVal) ? opC.length : opC.length - 1))
+        // console.log('opC', opC.slice())
+        // console.log('revSplitCode', revSplitCodeParamMode)
+        // console.log('opC.slice(1,opC.length - 1)', opC.slice(1,[5,6].some(d => d === firstVal) ? opC.length : opC.length - 1))
         opC.slice(1,[5,6].some(d => d === firstVal) ? opC.length : opC.length - 1)
                 .forEach((d,i) => {
-                    console.log('revSPlit[i]', revSplitCodeParamMode[i]);
-                    console.log('d', d);
+                    // console.log('revSPlit[i]', revSplitCodeParamMode[i]);
+                    // console.log('d', d);
                     if (revSplitCodeParamMode[i] === 0 || revSplitCodeParamMode[i] === undefined) {
-                        console.log('position')
+                        //console.log('position')
                         opC[i+1] = this.instr[opC[i+1]];
                     } else if (revSplitCodeParamMode[i] === 1) {
-                        console.log('immediate')
+                        //console.log('immediate')
                         opC[i+1] = opC[i+1];
                     }
-                    console.log('opC[i+1]', opC[i+1]);
+                    //console.log('opC[i+1]', opC[i+1]);
                 });
         if (opC.slice(1,opC.length - 1).length === 0 && firstVal === 4) {
             opC[1] = revSplitCodeParamMode[0] === 1 ? opC[1] : this.instr[opC[1]];
         } 
-        console.log('opC', opC)
-        console.log('split code slice', splitCode.slice(0,splitCode.length - 2))
+        //console.log('opC', opC)
+        //console.log('split code slice', splitCode.slice(0,splitCode.length - 2))
 
         let out = this.checkType(opC);
-        console.log('out', out)
+        //console.log('out', out)
 
         if (out.jump) {
             i = out.value;
         }
 
-        console.log('set', this.instr.slice());
-        console.log('i', i);
+        // console.log('set', this.instr.slice());
+        // console.log('i', i);
     }
     this.answer = this.instr[0];
 }
