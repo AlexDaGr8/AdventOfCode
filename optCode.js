@@ -110,32 +110,40 @@ optCode.prototype.run = function(i = 0) {
                     } else if (revSplitCodeParamMode[i] === 1) {
                         opC[i+1] = opC[i+1];
                     } else if (revSplitCodeParamMode[i] === 2) {
-                        console.log('test', opC[i+1])
                         opC[i+1] = this.instr[opC[i+1] + this.relativeBase] === undefined ? 0 : this.instr[opC[i+1] + this.relativeBase];
                     }
                 });
+
+        if (splitCode.length > 4) {
+            let lastVal = splitCode[0]
+            if (lastVal !== 2) {
+                opC[3] = opC[3];
+            } else if (lastVal === 2) {
+                opC[3] = opC[3] + this.relativeBase;
+            }
+        }
             
         if (opC.slice(1,opC.length - 1).length === 0 && [3,4,9].some(d => d === firstVal)) {
             if (revSplitCodeParamMode[0] === 0 || revSplitCodeParamMode[0] === undefined) {
                 opC[1] = this.instr[opC[1]];
             } else if (revSplitCodeParamMode[0] === 2) {
-                console.log('in the 2')
                 if (firstVal === 4) opC[1] = this.ifNullReturnZero(this.instr[opC[1] + this.relativeBase]);
                 else if (firstVal === 3) opC[1] = opC[1] + this.relativeBase;
                 else if (firstVal === 9) opC[1] = this.ifNullReturnZero(this.instr[opC[1] + this.relativeBase]);
                 //opC[1] = [3,9].some(d => d === firstVal) ? opC[1] + this.relativeBase : this.instr[opC[1] + this.relativeBase];
             } 
         } 
-        console.log('optCode', this.instr.slice(i - sliceVal, i))
-        console.log('opC', opC)
+        
+        // console.log('optCode', this.instr.slice(i - sliceVal, i))
+        // console.log('opC', opC)
         //console.log('split code slice', splitCode.slice(0,splitCode.length - 2))
 
         let out = this.checkType(opC);
 
-        console.log('arr', this.instr.slice())
-        console.log('relBase', this.relativeBase)
-        console.log('out', out)
-        console.log('------------------------------')
+        // console.log('arr', this.instr.slice())
+        // console.log('relBase', this.relativeBase)
+        // console.log('out', out)
+        // console.log('------------------------------')
 
         if (out.jump) {
             i = out.value;
