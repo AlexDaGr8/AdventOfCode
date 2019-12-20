@@ -11,6 +11,7 @@ function optCode(instructionsStr, input, phase, feedback, noun, verb) {
     this.answer = null;
     this.stop = false;
     this.feedback = feedback;
+    this.i = 0;
     if (!this.feedback) {
         this.phaseUsed = true;
     }
@@ -21,7 +22,7 @@ function optCode(instructionsStr, input, phase, feedback, noun, verb) {
         this.instr[2] = verb;
     }
     
-    this.run();
+    //this.run();
 }
 
 optCode.prototype.checkType = function(partialArr) {
@@ -75,6 +76,7 @@ optCode.prototype.checkType = function(partialArr) {
             break;
         default: 
             console.log('not found', partialArr[0])
+            console.log(partialArr.slice())
             break;
     }
     return { value: value, position: position, jump: jump };
@@ -151,6 +153,7 @@ optCode.prototype.run = function(i = 0) {
 
         // console.log('set', this.instr.slice());
         // console.log('i', i);
+        this.i = i;
     }
     //console.log(this.instr[i]);
     this.answer = { finished: this.instr[i] === 99, i: i, relBase: this.relativeBase, next: this.instr[i + 1], output: this.output.slice(-1).pop(), arr: this.instr.slice() };
