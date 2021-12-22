@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .container {
+            width: 80vw;
+            height: auto;
+            overflow-x: scroll;
+            margin: auto;
+            font-family: monospace;
+        }
+        .monospace {
+            font-family: monospace;
+        }
+        p b {
+            font-family: monospace;
+            color: skyblue;
+        }
+        p b.tree {
+            color: seagreen
+        }
+    </style>
+</head>
+<body>
+    <h1>Day 3 - things</h1>
+    <h3 id="tree-count"></h3>
+    <div class="container" id="container"></div>
+    <script type="module">
+        import readFile from '../readFile.js';
+        console.clear();
+        init();
+
+        async function init() {
+            let input = await readFile('./input.txt');
+            console.log('input', input)
+            let coords = [];
+            let inputParams = [
+                { slope: { down: 1, right: 1}, trees: 0 },
+                { slope: { down: 1, right: 3}, trees: 0 },
+                { slope: { down: 1, right: 5}, trees: 0 },
+                { slope: { down: 1, right: 7}, trees: 0 },
+                { slope: { down: 2, right: 1}, trees: 0 }
+            ];
+            let outputString = '';
+            for (let ip of inputParams) {
+                let foundTrees = findTreesInPath(ip.slope, [...input]);
+                let treeStr = foundTrees.reduce((a,c) => a += c, '');
+                ip.trees = treeStr.match(/X/g).length;
+                outputString += `- <a href="#r${ip.slope.right}-d${ip.slope.down}">Right ${ip.slope.right}, Down ${ip.slope.down}: ${ip.trees}</a><br>`
+                showMap(ip, foundTrees);
+            }
+            // let treesDefined = findTreesInPath({down: 1, right: 3}, [...input]);
+            // showMap({down: 1, right: 3}, treesDefined);
+            // let treeStr = treesDefined.reduce((a,c) => a += c, '');
+            let product = inputParams.reduce((a,c) => a * c.trees, 1);
+            let treeCountDiv = document.getElementById('tree-count');
+            treeCountDiv.innerHTML = `Number of trees: multiplied - ${product} <br>${outputString}`;
+        }
+        String.prototype.replaceAt = function(index, replacement) {
+            return this.substr(0, index) + replacement + this.substr(index + replacement.length);
+        }
+        function showMap({slope, trees}, arr) {
+            let cont = document.getElementById('container');
+            let h4 = document.createElement('h4');
+            h4.id = `r${slope.right}-d${slope.down}`;
+            h4.innerText = `- Right ${slope.right}, Down ${slope.down}: ${trees}`
+            cont.appendChild(h4);
+            for (let a of arr) {
+                let p = document.createElement('p')
+                let tree = a.indexOf('X');
+                // if (tree > -1) {
+                //     a = a.replaceAt(tree, '<b>X</b>');
+                // } else {
+                //     a = a.replaceAt(a.indexOf('O'), '<b>O</b>');
+                // }
+                // p.classList.add('monospace');
+                p.innerHTML = a
+                cont.appendChild(p);
+            }
+        }
+        function findTreesInPath({down, right}, coords) {
+            let length = coords[0].length;
+            let height = coords.length;
+            let newArr = [...new Set(coords)];
+            let countRight = 0;
+            let countDown = 0;
+            while (countDown < height) {
+                if (countRight >= newArr[0].length) {
+                    for (let i = 0; i < newArr.length; i++) { 
+                        newArr[i] = newArr[i] + coords[i];
+                    }
+                }
+                let findCoord = newArr[countDown].charAt(countRight)
+                if (findCoord === '.') {
+                    newArr[countDown] = newArr[countDown].replaceAt(countRight, `<b>O</b>`);
+                } else {
+                    newArr[countDown] = newArr[countDown].replaceAt(countRight, `<b class="tree">X</b>`);
+                }
+                countRight += right;
+                countDown += down;
+            }
+            return newArr;
+        }
+    </script>
+</body>
+</html>

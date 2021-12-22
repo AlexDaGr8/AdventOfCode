@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Day 4 - passport shinannagons</h1>
+    <h4 id="result"></h4>
+    <script type="module">
+        import readFile from '../readFile.js'
+        
+        init();
+
+        let resultEl = document.getElementById('result');
+
+        async function init() {
+            let input = await readFile('./input.txt');
+            let passports = fixInput(input);
+            let validKeys = ['byr','iyr','eyr','hgt','hcl','ecl','pid'];
+            let validPassports = [];
+            for (let p of passports) {
+                let keys = Object.keys(p);
+                let valid = validation(p, validKeys);
+                if (valid) {
+                    validPassports.push(p);
+                }
+            }
+            resultEl.innerText = `${validPassports.length} Valid Passports`;
+        }
+        function validation(passport, validKeys) {
+            let keys = Object.keys(passport);
+            let valid = validKeys.every(vk => keys.includes(vk));
+            if (valid) {     // byr
+                let byrValid = validNumber(passport.byr, 1920, 2002);
+                let iyrValid = validNumber(passport.iyr, 2010, 2020);
+                let eyrValid = validNumber(passport.eyr, 2020, 2030);
+                let hgtValid = false;
+                if (passport.hgt.includes('cm')) {
+                    let cm = passport.hgt.split('cm')[0];
+                    hgtValid = validNumber(cm, 150, 193);
+                } else if (passport.hgt.includes('in')) {
+                    let inch = passport.hgt.split('in')[0];
+                    hgtValid = validNumber(inch, 59, 76);
+                } 
+                let hclValid = passport.hcl.match(/#[0-9a-f]{6}/g) !== null;
+                let eyeColors = ['amb', 'blu', 'brn', 'gry', 'grn', 'hzl', 'oth']
+                let eclValid = eyeColors.includes(passport.ecl);
+                let pidValid = passport.pid.length === 9;
+                return valid && byrValid && iyrValid && eyrValid && hgtValid && hclValid && eclValid && pidValid; 
+            }
+            return false;
+        }
+        function validNumber(val,min,max) {
+            return +val >= min && +val <= max
+        }
+        function fixInput(input) {
+            let result = [];
+            let emptyIds = input.reduce((a,c,i) => {
+                if (c === '') {
+                    a.push(i);
+                }
+                return a;
+            }, [-1])
+            emptyIds.push(input.length)
+            for (let i = 1; i < emptyIds.length; i++) {
+                let str = '';
+                for (let j = emptyIds[i - 1] + 1; j < emptyIds[i]; j++) {
+                    str += input[j] + ' ';
+                }
+                let keyVal = str.split(' ');
+                let total = [];
+                for (let kv of keyVal) {
+                    let kvSpl = kv.split(':');
+                    kvSpl[0] = `\"${kvSpl[0]}\"`
+                    kvSpl[1] = `\"${kvSpl[1]}\"`
+                    total.push(kvSpl.join(':'));
+                }
+                total.splice(total.length - 1, 1);
+                let jsonStr = `{ ${total.join(',')} }`;
+                let json = JSON.parse(jsonStr);
+                result.push(json);
+            }
+            return result;
+        } 
+    </script>
+</body>
+</html>

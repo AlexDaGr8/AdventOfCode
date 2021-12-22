@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Day 6</h1>
+    <script type="module">
+        import readFile from '../readFile.js'
+
+        init();
+
+        async function init() {
+            let answers = await readFile('./input.txt');
+            let groups = [{ answers: []}];
+            console.log('answers', answers)
+            for (let a of answers) {
+                if (a !== '') {
+                    groups[groups.length - 1].answers.push(a)
+                } else {
+                    groups.push({ answers: []})
+                }
+            }
+            groups.forEach(g => {
+                g.split = g.answers.map(d => d.split('')).flat()
+                g.unique = [...new Set(g.split)];
+                g.allYes = g.unique.reduce((a,c) => {
+                    if (g.answers.every(answ => answ.includes(c))) {
+                        a.push(c)
+                    }
+                    return a;
+                }, [])
+            })
+            console.log('groups', groups)
+            console.log('sum', groups.reduce((a,c) => a + c.unique.length, 0));
+            console.log('sum all yes', groups.reduce((a,c) => a + c.allYes.length, 0));
+        }
+    </script>
+</body>
+</html>

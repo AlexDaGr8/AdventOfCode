@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Day 10 - Adapter Array</h1>
+    <script type="module">
+        import readFile from '../readFile.js'
+
+        Array.createFrom = function(arr) {
+            return Object.assign([],arr)
+        }
+
+        init();
+
+        async function init() { 
+            let input = (await readFile('./input.txt'))
+                .map(d => +d);
+            partOne(input)
+            let data = {
+                listID: 0,
+                list: [[]],
+                iterator: 0,
+                tree: {}
+            };
+            partTwo_uniqueArrangments(input, data)
+        }
+        function partTwo_uniqueArrangments(input, data) {
+            let adaptors = JSON.parse(JSON.stringify(input));
+            adaptors.push(0);
+            adaptors.push(Math.max(...adaptors) + 3);
+            adaptors.sort((a,b) => a - b);
+            console.log(adaptors)
+            let diffThree = [];
+            let lists = []
+            for (let i = 1; i < adaptors.length; i++) {
+                let diff = adaptors[i] - adaptors[i - 1];
+                if (diff === 3) {
+                    diffThree.push({
+                        index: i,
+                        value: adaptors[i],
+                        prevVal: adaptors[i - 1]
+                    });
+                    if (diffThree.length > 1) {
+                        let segArr = adaptors.slice(diffThree[diffThree.length - 2].index, i);
+                        lists.push(segArr)
+                    } else if (diffThree.length === 1) {
+                        let segArr = adaptors.slice(0, i);
+                        lists.push(segArr)
+                    }
+                }
+            }
+            console.log('lists', lists)
+            console.log('diffThree', diffThree)
+
+            let c5 = lists.filter(d => d.length === 5).length;
+            let c4 = lists.filter(d => d.length === 4).length;
+            let c3 = lists.filter(d => d.length === 3).length;
+            let c2 = lists.filter(d => d.length === 2).length;
+            console.log(`c5: ${c5}, c4: ${c4}, c3: ${c3}, c2: ${c2}`)
+            let sevens = Math.pow(7, c5);
+            console.log('sevens', sevens)
+            let fours = Math.pow(4, c4);
+            console.log('fours', fours)
+            let twos = Math.pow(2, c3);
+            console.log('twos', twos)
+            let prod = twos * fours * sevens;
+            console.log('prod', prod)
+            
+
+            // getUnique(adaptors, 0, data);
+            // console.log('adaptors', adaptors)
+            // console.log('data', data)
+        }
+        function getUnique(list, nextNum, data) {
+            let nextNums = list.filter(d => d > nextNum && d <= nextNum + 3);
+            if (nextNums.length > 0) {
+                for (let nn of nextNums) {
+                    getUnique(list, nn, data)
+                }
+            } else {
+                data.listID++;
+            }
+        }
+
+        function partOne(input) {
+            let adaptors = JSON.parse(JSON.stringify(input));
+            adaptors.push(0)
+            adaptors.sort((a,b) => a - b);
+            let result = [];
+            for (let i = 1; i < adaptors.length; i++) {
+                let diff = adaptors[i] - adaptors[i - 1];
+                result.push(diff)
+            }
+            result.push(3)
+            let countOne = result.filter(d => d === 1).length;
+            let countThree = result.filter(d => d === 3).length;
+            console.log('countOne', countOne)
+            console.log('countThree', countThree)
+            console.log('inputLength', adaptors.length)
+            let answer = countOne * countThree;
+        }
+        function factorial(top, bottom) {
+            let arrSize = bottom ? top - bottom : top
+            let arr = Array.from(Array(arrSize).keys())
+                .map(d => bottom ? (d + 1 + bottom) : (d + 1));
+            return arr.reduce((a,c) => a * c, 1)
+        }
+    </script>
+</body>
+</html>

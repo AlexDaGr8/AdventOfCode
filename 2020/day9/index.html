@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Day 9 - Encoding Error</h1>
+    <script type="module">
+        import readFile from '../readFile.js'
+
+        init();
+
+        async function init() { 
+            let testData = {
+                preambleAmount: 5,
+                list: (await readFile('./test.txt')).map(d => +d),
+                answer: -1,
+                answer_p2: -1
+            }
+            let inputData = {
+                preambleAmount: 25,
+                list: (await readFile('./input.txt')).map(d => +d),
+                answer: -1,
+                answer_p2: -1
+            }
+            decode(inputData);
+            console.log('answer', inputData.answer)
+            console.log('answer p2', inputData.answer_p2)
+        }
+        function decode(data) {
+            for (let i = data.preambleAmount; i < data.list.length; i++) {
+                let prevList = data.list.slice(i - data.preambleAmount, i)
+                let findSum = findSumOfTwo(prevList, data.list[i])
+                if (!findSum) {
+                    data.answer = data.list[i]
+                    break;
+                }
+            }
+            let p2AnswerList = findSumOfAtLeastTwo(data.list, data.answer);
+            console.log('p2Answer', p2AnswerList)
+            let { max, min } = extent(p2AnswerList)
+            console.log('max', max)
+            console.log('min', min)
+            data.answer_p2 = max + min;
+        }
+        function findSumOfTwo(list, num) {
+            for (let i = 0; i < list.length - 1; i++) {
+                for (let j = i + 1; j < list.length; j++) {
+                    let sum = list[i] + list[j]
+                    if (sum === num) {
+                        return [list[i], list[j], num];
+                    }
+                }
+            }
+            return undefined;
+        }
+        function findSumOfAtLeastTwo(list, num) {
+            let testList = JSON.parse(JSON.stringify(list));
+            let findNum = testList.findIndex(d => d === num);
+            testList.splice(findNum, 1, '');
+            let largerNums = list.filter(l => l > num);
+            let listOfList = [];
+            for (let i = 0; i < largerNums.length; i++) {
+                let foundId = testList.findIndex(d => d === largerNums[i])
+                testList.splice(foundId, 1, '');
+            }
+            let listID = 0;
+            for (let tl of testList) {
+                if (tl !== '') {
+                    if (typeof listOfList[listID] === 'undefined') {
+                        listOfList.push([]);
+                    }
+                    listOfList[listID].push(tl)
+                } else {
+                    listID += listID === listOfList.length - 1 ? 1 : 0;
+                }
+            }
+            let resultList = []
+            for (let i = 0; i < listOfList.length; i++) {
+                console.log(listOfList[i])
+                for (let j = 0; j < listOfList[i].length; j++) {
+                    let sum = listOfList[i][j];
+                    resultList = [];
+                    resultList.push(listOfList[i][j])
+                    for (let k = j + 1; k < listOfList[i].length; k++) {
+                        sum += listOfList[i][k];
+                        resultList.push(listOfList[i][k])
+                        if (sum === num) {
+                            console.log('num found', resultList)
+                            return resultList;
+                        }
+                        if (sum > num) break;
+                    }
+                }
+            }
+        }
+        function extent(arr, func = null) {
+            let mapArr = func ? mapArr.map(func) : arr;
+            let max = Math.max(...mapArr)
+            let min = Math.min(...mapArr)
+            return { max, min }
+        }
+    </script>
+</body>
+</html>

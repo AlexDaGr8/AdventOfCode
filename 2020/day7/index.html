@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Day 7 - bags in bags in bags</h1>
+    <script type="module">
+        import readFile from '../readFile.js'
+
+        init();
+
+        async function init() {
+            let bagRules = await readFile('./input.txt');
+            let rules = {};
+            for (let bagR of bagRules) {
+                let main = bagR.match(/^[a-z]+ [a-z]+/g)[0].split(' ').join('_');
+                let contents = bagR.match(/\d [a-z]+ [a-z]+/g) ? 
+                    bagR.match(/\d [a-z]+ [a-z]+/g).map(c => {
+                        let splitC = c.split(' ');
+                        return {
+                            value: +splitC[0],
+                            color: `${splitC[1]}_${splitC[2]}`
+                        }
+                    }) : 
+                    [];
+                rules[main] = {
+                    color: main,
+                    contents: contents,
+                    value: 0
+                }
+            }
+            console.log('rules', rules)
+            let occurances = {
+                values: []
+            }
+            findAllOccurances('shiny_gold', rules, occurances);
+            console.log('occurances', occurances)
+            let occ = {
+                level: 1,
+                values: [],
+                end: false,
+                color: null
+            }
+            let counter = { value: 0 };
+            findMainLevelOcc('shiny_gold', rules, occ, counter);
+            console.log('occ', occ)
+            console.log('counter', counter)
+            console.log('done')
+        }
+        // part 1
+        function findAllOccurances(color, rules, occurances) {
+            for (let rule in rules) {
+                if (rules[rule].contents.some(cont => cont.color === color)) {
+                    if (!occurances.values.some(v => v.color === rules[rule].color)) {
+                        occurances.values.push(rules[rule]);
+                    }
+                    findAllOccurances(rules[rule].color, rules, occurances);
+                }
+            }
+        }
+        // part 2
+        function findMainLevelOcc(color, rules, occ, counter) {
+            occ.color = color;
+            for (let rule in rules) {
+                if (rules[rule].color === occ.color) {
+                    if (rules[rule].contents.length > 0) {
+                        // this is what's pushing to the values
+                        occ.values = rules[rule].contents
+                        for (let cont of rules[rule].contents) {
+                            for (let i = 0; i < cont.value; i++) {
+                                counter.value++;
+                                cont.values = [];
+                                findMainLevelOcc(cont.color, rules, cont, counter)
+                            }
+                        }
+                    } 
+                }
+            }
+        }
+    </script>
+</body>
+</html>

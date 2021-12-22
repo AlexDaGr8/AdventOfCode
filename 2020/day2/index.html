@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .corrupt {
+            color: salmon;
+        }
+        .valid {
+            color: seagreen;
+        }
+        .password {
+            margin: 0 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Day 2 - Valid passwords</h1>
+    <h4 id="valid"></h4>
+    <ul id="passwords"></ul>
+    <script type="module">
+        import readFile from '../readFile.js';
+
+        console.clear();
+        let ul = document.getElementById('passwords');
+
+        init();
+
+        async function init() {
+            let passwords = [];
+            let pwSet = await readFile('./input.txt');
+            pwSet.forEach(pw => {
+                let spl = pw.split(': ');
+                let set = {
+                    rule: spl[0],
+                    password: spl[1]
+                }
+                passwords.push(set);
+            });
+            let tested = showPwSet(passwords);
+            let v = document.getElementById('valid');
+            v.innerText = `${tested.valid.length} passwords of ${tested.total.length} are valid, ${tested.corrupt.length} are currupt`
+        }
+        function showPwSet(arr) {
+            let validPwords = [];
+            let corruptPwords = [];
+            for (let a of arr) {
+                let li = document.createElement('li')
+                let rule = document.createElement('span')
+                rule.innerText = a.rule + ' -';
+                li.appendChild(rule);
+                let pword = document.createElement('span')
+                pword.innerText = a.password;
+                pword.classList.add('password');
+                let test = testPassword(a);
+                if (test) {
+                    pword.classList.add('valid');
+                    validPwords.push(a);
+                } else {
+                    pword.classList.add('corrupt');
+                    corruptPwords.push(a);
+                }
+                li.appendChild(pword);
+                ul.appendChild(li);
+            }
+            return {
+                valid: validPwords,
+                corrupt: corruptPwords,
+                total: arr
+            };
+        }
+        function testPasswordTotalCount(pwRule) {
+            let rules = pwRule.rule.split(' ');
+            let occurance = rules[0].split('-');
+            let value = rules[1];
+            let regex = new RegExp(`${value}`, 'g')
+            let find = pwRule.password.match(regex);
+            if (find) {
+                let fl = find.join('').length;
+                return fl >= occurance[0] && fl <= occurance[1];
+            }
+            return false;
+        }
+        function testPassword(pwRule) {
+            let rules = pwRule.rule.split(' ');
+            let occurance = rules[0].split('-');
+            let value = rules[1];
+            let charAtOc1 = pwRule.password.charAt(occurance[0] - 1);
+            let charAtOc2 = pwRule.password.charAt(occurance[1] - 1);
+            let xOR = charAtOc1 === value ? charAtOc2 !== value : charAtOc2 === value;
+            console.log('----------');
+            console.log('password', pwRule.password)
+            console.log('occurance[0]', occurance[0])
+            console.log('occurance[1]', occurance[1])
+            console.log('charAtOc1', charAtOc1);
+            console.log('charAtOc2', charAtOc2);
+            console.log('value', value);
+            console.log('xOR', xOR)
+            return xOR;
+        }
+    </script>
+</body>
+</html>

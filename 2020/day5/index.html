@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Day 5 - Seat Assignment</h1>
+    <h4 id="highest-id"></h4>
+    <div id="result"></div>
+    <script type="module">
+        import readFile from '../readFile.js';
+
+        Array.create = function(size) {
+            return Array.from(Array(size).keys());
+        }
+        Math.sum = function(arr, field = undefined) {
+            if (field) {
+                return arr.reduce((a,c) => a + c[field], 0)
+            }
+            return arr.reduce((a,c) => a + c, 0);
+        }
+
+        class BoardingPass {
+            constructor(code) {
+                this.code = code;
+                this.row = Array.create(128);
+                this.column = Array.create(8);
+                this.id = -1;
+            }    
+            toString() {
+                return `${this.code}: row ${this.row}, column ${this.column}, seat ID ${this.id}`;
+            }
+        }
+
+        let resultElem = document.getElementById('result');
+        init();
+
+        async function init() {
+            let input = await readFile('./test.txt');
+
+            let boardingPasses = [];
+
+            for (let bp of input) {
+                let boardingPass = new BoardingPass(bp);
+                for (let char of bp) {
+                    if (['B','F'].includes(char)) {
+                        let half = boardingPass.row.length/2;
+                        boardingPass.row = char === 'F' ?
+                            boardingPass.row.slice(0,half) :
+                            boardingPass.row.slice(half, boardingPass.row.length);
+                        if (boardingPass.row.length === 1) {
+                            boardingPass.row = boardingPass.row[0];
+                        }
+                    }
+                    if (['R','L'].includes(char)) {
+                        let half = boardingPass.column.length/2;
+                        boardingPass.column = char === 'L' ?
+                            boardingPass.column.slice(0,half) :
+                            boardingPass.column.slice(half, boardingPass.column.length);
+                        if (boardingPass.column.length === 1) {
+                            boardingPass.column = boardingPass.column[0];
+                        }
+                    }
+                }
+                boardingPass.id = boardingPass.row * 8 + boardingPass.column;
+                boardingPasses.push(boardingPass);
+            }
+            boardingPasses
+                .sort((a,b) => a.id - b.id)
+                .forEach(bp => display(bp));
+            let mySeat = null;
+            // part 2 first solution
+            for (let i = 0; i < boardingPasses.length - 1; i++) {
+                if (boardingPasses[i + 1].id !== (boardingPasses[i].id + 1)) {
+                    mySeat = boardingPasses[i].id + 1;
+                    break;
+                }
+            }
+            // part 2 another solution? 
+            let my = {
+                seat: null
+            };
+            getSeat(boardingPasses, my);
+            console.log('seat', my.seat);
+
+            let { max, min } = extent(boardingPasses, d => d.id)
+            document.getElementById('highest-id').innerHTML = `
+                lowest ID: ${min.toString()} <br>
+                highst ID: ${max.toString()} <br>
+                My Seat ID: ${mySeat} <br>
+                My Seat ID From recursion: ${my.seat}`;
+        }
+        function getSeat(arr, my) {
+            let { min,max } = extent(arr, d => d.id);
+            let arrayOfAllIds = Array.create((max - min) + 1).map(k => k + min);
+            let fracAllIds = arrayOfAllIds.reduce((a,c) => a + c, 0);
+            let fracArrIds = arr.reduce((a,c) => a + c.id, 0);
+            let half = arr.length/2;
+            if (fracAllIds !== fracArrIds) {
+                console.log('arr', arr)
+                console.log('fracAllIds', fracAllIds)
+                console.log('fracArrIds', fracArrIds)
+                if (arr.length > 2) {
+                    getSeat([...arr].slice(0,half), my)
+                    getSeat([...arr].slice(half,arr.length), my)
+                } else {
+                    console.log('---- found my seat ----')
+                    console.log('found fracAllIds', fracAllIds)
+                    console.log('found fracArrIds', fracArrIds)
+                    my.seat = fracAllIds - fracArrIds;
+                }
+            } 
+        }
+        function extent(arr, func) {
+            let vals = arr.map(func);
+            return {
+                min: Math.min(...vals),
+                max: Math.max(...vals)
+            };
+        }
+        function display(bp) {
+            let para = document.createElement('p')
+            para.innerText = bp.toString();
+            resultElem.appendChild(para)
+        }
+        function maxOfField(arr, field) {
+            let reduceMax = arr.reduce((a,c) => c[field] > a[field] ? c : a, arr[0])
+            return reduceMax;
+        }
+    </script>
+</body>
+</html>
