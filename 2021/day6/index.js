@@ -3,28 +3,35 @@ import { getResult } from '../Util.js';
 console.clear();
 init();
 async function init() {
-  let data = await getResult('./day6/inputtest.txt').then(part2);
+  let data = await getResult('./day6/inputtest.txt').then(part1);
 
 }
 function part1(input) {
   console.log('-----part1-----')
-  // let data = input.split(',').map(d => +d);
-  let data = [0];
-  let set = [];
-
-  console.log('formula', fishFormula(data[0], 18))
-
-  for (let day = 0; day < 18; day++) {
-    for (let i in data) {
-      data[i]--;
-      if (data[i] < 0) {
-        data.push(8);
-        data[i] = 6
+  let data = input.split(',').map(d => +d);
+  // let data = [0]
+  let days = 80
+  let fish = data.slice();
+  for (let day = 0; day < days; day++) {
+    for (let i in fish) {
+      fish[i]--;
+      if (fish[i] < 0) {
+        fish.push(8);
+        fish[i] = 6
       }
     }
   }
 
-  console.log('data', data.length);
+  console.log('fish', fish.length)
+
+  let newFish = 0;
+  data.forEach(d => {
+    console.log('-------d-------', d)
+    let created = fishFormula(d, days);
+    console.log('created', created)
+    newFish += created;
+    console.log('newFish', newFish)
+  });
 };
 
 function part2(input) {
@@ -57,9 +64,8 @@ function part2(input) {
 
 function fishFormula(life, days, created) {
   let firstFishDay = (days - life);
-  let create = Math.floor(1 + (firstFishDay / 7));
-  console.log('create', create)
-  console.log('firstFishDay', firstFishDay)
+  let create = Math.round((firstFishDay / 6));
+  console.log('initial create', create)
   let creations = 0;
   let iteration = 0;
   findCreations(firstFishDay, create)
@@ -71,15 +77,15 @@ function fishFormula(life, days, created) {
     for (let i = 0; i < fish; i++) {
       if (day <= 7) break;
       else {
-        let created = Math.floor((day - 8) / 7);
-        console.log(day, thisIter, created)
+        let created = Math.round((day - 2) / 6);
+        console.log('fish created', created)
         creations += created;
-        console.log(creations)
-        day = day - 8;
+        console.log('new creations', creations)
+        day = day - 9;
         findCreations(day, created)
       }
     }
   }
   console.log('creations', creations);
-  return 1 + create + creations;
+  return create + creations;
 }
