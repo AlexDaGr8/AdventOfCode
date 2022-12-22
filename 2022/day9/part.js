@@ -2,6 +2,67 @@ import { Day } from '../Util.js';
 
 console.clear();
 
+class Knot {
+    target = {...{ x: 55, y: 23 }, history: [{ x: 55, y: 23 }]};
+    knot = undefined;
+    constructor(id, handler) {
+        this.id = id;
+        this.knot = new Proxy(this.target, handler);
+    }
+
+    moveKnot(previous) {
+        let xDif = previous.knot.x - this.knot.x;
+        let newX = this.knot.x;
+        let yDif = previous.knot.y - this.knot.y;
+        let newY = this.knot.y;
+
+
+        if (Math.abs(xDif) > 0) {
+            newX = this.knot.x + Math.sign(xDif);
+        }
+        if (Math.abs(yDif) > 0) {
+            newY = this.knot.y + Math.sign(yDif);
+        }
+
+        this.knot.x = newX;
+        this.knot.y = newY;
+    }
+
+    moveDiagonal(previous) {
+        let lastLocation = previous.knot.history.slice(-1)[0];
+        if (previous.id > 0) {
+            lastLocation = previous.knot;
+        }
+
+        let isUp = (lastLocation.y - this.knot.y) > 0;
+        let isRight = (lastLocation.x - this.knot.x) > 0;
+
+        this.knot.x = isRight ? this.knot.x + 1 : this.knot.x - 1;
+        this.knot.y = isUp ? this.knot.y + 1 : this.knot.y - 1;
+    }
+
+    moveHead(direction) {
+        switch(direction) {
+            case 'R':
+                this.knot.x = this.knot.x + 1;
+                break;
+            case 'L':
+                this.knot.x = this.knot.x - 1;
+                break;
+            case 'U':
+                this.knot.y = this.knot.y + 1;
+                break;
+            case 'D':
+                this.knot.y = this.knot.y - 1;
+                break;
+        }
+    }
+
+    log() {
+        console.log(`head(${this.id}) x: ${this.knot.x}, y: ${this.knot.y}`);
+    }
+}
+
 export class Part extends Day {
     constructor(fileName) {
         super(fileName);
@@ -9,6 +70,18 @@ export class Part extends Day {
 
     render() {
         console.log(this.data);
+
+        // this.showResult();
+
+        // **** Part 1 *** //
+        // this.part1(this.data);
+
+        // *** Part 2 *** //
+        this.part2(this.data);
+
+    }
+
+    part1(data) {
         this.margin = { top: 20, right: 20, bottom: 20, left: 50 };
         this.width = document.body.clientWidth - this.margin.right - this.margin.left;
         this.height = document.body.clientHeight - this.margin.top - this.margin.bottom;
@@ -68,18 +141,6 @@ export class Part extends Day {
         //     .attr('d', this.line(this.tail.history))
         //     .attr('fill', 'none')
         //     .attr('stroke', 'steelblue');
-
-        // this.showResult();
-
-        // **** Part 1 *** //
-        this.part1(this.data);
-
-        // *** Part 2 *** //
-        // this.part2(this.data);
-
-    }
-
-    part1(data) {
         const moves = data.map(d => {
             let split = d.split(' ');
             return {
@@ -269,6 +330,164 @@ export class Part extends Day {
     }
 
     part2(data) {
+        console.log("/// part2 \\\\\\");
+
+        this.resultDiv = document.createElement('div');
+        this.resultDiv.id = 'result';
+
+        this.moveEl = document.createElement('div');
+        this.moveEl.id = 'move';
+        this.moveEl.innerHTML = `---- <span id="direction"></span> <span id="step"></span> ----`
+
+        document.body.appendChild(this.moveEl);
+        document.body.appendChild(this.resultDiv);
+
+
+        this.direction = document.getElementById('direction');
+
+        this.step = document.getElementById('step');
+
+
+        const moves = data.map(d => {
+            let split = d.split(' ');
+            return {
+                direction: split[0],
+                steps: +split[1]
+            }
+        });
+        const headHandler = {
+            set(obj, prop, value) {
+                obj['history'].push({
+                    x: obj.x,
+                    y: obj.y
+                });
+
+                obj[prop] = value;
+
+                return true;
+            }
+        };
+        const handler = {
+            set(obj, prop, value) {
+                obj[prop] = value;
+
+                if (prop === 'y') {
+                    obj['history'].push({
+                        x: obj.x,
+                        y: obj.y
+                    });
+                }
+            
+                return true;
+            }
+        }
+        const knots = [new Knot(0, headHandler)];
+        const numKnots = 10;
         
+        for (let i = 1; i < numKnots; i++) {
+            knots.push(new Knot(i, handler))
+        }
+
+        let delay = 0;
+        
+        for (let move of moves) {
+            this.updateDirection(move.direction, delay);
+
+            // console.log(`%c#### move direction ${move.direction} ####`, 'color: yellow')
+            for (let s in Array(move.steps).fill(1)) {
+                // console.log(`%c## move step ${s} ##`, 'color: pink')
+                knots[0].moveHead(move.direction);
+                
+                // knots[0].log();
+
+                for (let i = 1; i < numKnots; i++) {
+                    let distance = this.getDistance(knots[i - 1].knot, knots[i].knot)
+                    
+                    if (distance > 1.5) {
+                        if ((distance - Math.floor(distance)) !== 0) {
+                            knots[i].moveDiagonal(knots[i - 1])
+                        } else {
+                            knots[i].moveKnot(knots[i - 1]);
+                        }
+
+                        // knots[i].log();
+                    } 
+                }
+
+                this.buildBoard(knots, s, delay++);
+            }
+        }
+
+        let headMax = {
+            x: Math.max(...knots[0].knot.history.map(d => d.x)),
+            y: Math.max(...knots[0].knot.history.map(d => d.y)),
+        }
+        let headMin = {
+            x: Math.min(...knots[0].knot.history.map(d => d.x)),
+            y: Math.min(...knots[0].knot.history.map(d => d.y)),
+        }
+        let columns = headMax.x - headMin.x;
+        let rows = headMax.y - headMin.y;
+
+        console.log('headMax', headMax);    
+        console.log('headMin', headMin);   
+        console.log('columns', columns); 
+        console.log('rows', rows);
+
+        let unique = [...new Set(knots[knots.length - 1].knot.history.map(h => `x:${h.x},y:${h.y}`))]
+
+        console.log('unique', unique.length);
+        
+    }
+    
+    updateDirection(direction, delay) {
+        setTimeout(() => {
+            this.direction.innerText = direction;
+        }, 300 * delay);
+    }
+
+    updateStep(step, delay) {
+        setTimeout(() => {
+            this.step.innerText = step;
+        }, 300 * delay);
+    }
+
+    buildBoard(data, step, delay) {
+        this.updateStep(step, delay);
+
+        let board = [];
+        for (let r = 0; r < 190; r++) {
+            board.push([]);
+            for (let c = 0; c < 301; c++) {
+                let find = data.find(d => d.knot.x === c && d.knot.y === r);
+                let findHistory = data[data.length - 1].knot.history.find(d => d.x === c && d.y === r);
+
+                if (find) {
+                    board[r].push(find.id);
+                } else if (findHistory) {
+                    board[r].push('#');
+                } else {
+                    board[r].push('.')
+                }
+            }
+        }
+
+        setTimeout(() => {
+            this.resultDiv.innerText = board.map(r => r.join('\t')).join('\n') + '\n\n';
+        }, 300 * delay);
+
+        // console.log('board', board);
+
+        // let stepEl = document.createElement('div');
+    
+        // stepEl.innerText = `--- step ${step} ---`;
+    
+        // document.body.appendChild(stepEl);
+
+        // let result = document.createElement('div');
+    
+        // result.innerText = board.map(r => r.join('\t')).join('\n') + '\n\n';
+    
+        // document.body.appendChild(result);
     }
 }
