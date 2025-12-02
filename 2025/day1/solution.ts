@@ -26,5 +26,22 @@
  */
 
 export function solve(input: string): number {
-  return 0;
+  const rotations = input.split("\n");
+  let dial = 50;
+  let zeroCount = 0;
+
+  for (let rotation of rotations) {
+    const rotationNotation = rotation[0];
+    const rotationClicks = +rotation.slice(1);
+    if (rotationNotation === "R") {
+      dial += rotationClicks;
+    } else {
+      dial -= rotationClicks;
+    }
+    dial = dial % 100;
+    if (dial === 0) {
+      zeroCount++;
+    }
+  }
+  return zeroCount;
 }
