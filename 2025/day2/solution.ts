@@ -96,43 +96,49 @@ export function sumInvalidIds(input: string): number {
  * Examples: 1111111 (1 x7), 123123123 (123 x3), 1212121212 (12 x5)
  */
 export function isInvalidIdPart2(id: string): boolean {
-  // create the 'look-forward' range, which is the length of the current number. loop will end when 'look forward range' is out of index
-  // start current number as the first number, number-memory starts as the same first number.
-  // compare the curr num to the next number, if it is equal, set 'repeating' to 'true', add the next number to the number-memory, and continue
-  // if the next number is not equal to curr num, set 'repeating to 'false', add the next number to the number-memory, which becomes the new current number
-  let currNum = id[0];
-  // let numbersToCompareIdx = 1;
-  let numberBuilt = id[0];
-  let isRepeating = true;
-  let i = 1;
-  let id_end = 1;
-  while (id_end <= id.length) {
-    let i_start = currNum.length;
-    let i_end = i + currNum.length;
-    let numbersToCompareIdx = id.slice(i_start, i_end);
-    if (currNum === numbersToCompareIdx) {
-      isRepeating = true;
-      numberBuilt += id[i];
-      i++;
-    } else {
-      isRepeating = false;
-      numberBuilt += id[i];
-      currNum += id[i];
-      i++;
+  /**
+   * start with substring as first char
+   * check if entire string is the repeating substring
+   * if not, add the next char to the substring, repeat
+   */
+  for (let subStringLen = 1; subStringLen <= id.length / 2; subStringLen++) {
+    if (id.length % subStringLen !== 0) {
+      continue;
+    }
+    let subString = id.slice(0, subStringLen);
+    const repeatCount = id.length / subStringLen;
+    if (id === subString.repeat(repeatCount)) {
+      return true;
     }
   }
 
-  return isRepeating;
-}
-
-export function retrieveRange(input: number, id: number) {
-  // given an input and the id-number, retrieve the
+  return false;
 }
 
 export function findInvalidIdsPart2(input: string): string[] {
-  return [];
+  // same as part 1. too lazy to change test names
+  let idArray = [];
+  if (input.includes("-")) {
+    const [start, end] = input.split("-").map(Number);
+    for (let i = start; i <= end; i++) {
+      idArray.push(String(i));
+    }
+  } else {
+    idArray.push(input);
+  }
+
+  return idArray.filter(isInvalidIdPart2);
 }
 
 export function sumInvalidIdsPart2(input: string): number {
-  return 0;
+  // same as part 1 too lazy to change test names
+  const ranges: string[] = input.split(",");
+  let invalidIds: string[] = [];
+  ranges.forEach((range: string) => {
+    const foundInvalidIds: string[] = findInvalidIdsPart2(range);
+    invalidIds.push(...foundInvalidIds);
+  });
+  const invalidIdNumbers = invalidIds.map(Number);
+  const sum = invalidIdNumbers.reduce((x, y) => x + y, 0);
+  return sum;
 }
