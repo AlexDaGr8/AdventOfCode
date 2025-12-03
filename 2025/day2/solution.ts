@@ -96,7 +96,37 @@ export function sumInvalidIds(input: string): number {
  * Examples: 1111111 (1 x7), 123123123 (123 x3), 1212121212 (12 x5)
  */
 export function isInvalidIdPart2(id: string): boolean {
-  return false;
+  // create the 'look-forward' range, which is the length of the current number. loop will end when 'look forward range' is out of index
+  // start current number as the first number, number-memory starts as the same first number.
+  // compare the curr num to the next number, if it is equal, set 'repeating' to 'true', add the next number to the number-memory, and continue
+  // if the next number is not equal to curr num, set 'repeating to 'false', add the next number to the number-memory, which becomes the new current number
+  let currNum = id[0];
+  // let numbersToCompareIdx = 1;
+  let numberBuilt = id[0];
+  let isRepeating = true;
+  let i = 1;
+  let id_end = 1;
+  while (id_end <= id.length) {
+    let i_start = currNum.length;
+    let i_end = i + currNum.length;
+    let numbersToCompareIdx = id.slice(i_start, i_end);
+    if (currNum === numbersToCompareIdx) {
+      isRepeating = true;
+      numberBuilt += id[i];
+      i++;
+    } else {
+      isRepeating = false;
+      numberBuilt += id[i];
+      currNum += id[i];
+      i++;
+    }
+  }
+
+  return isRepeating;
+}
+
+export function retrieveRange(input: number, id: number) {
+  // given an input and the id-number, retrieve the
 }
 
 export function findInvalidIdsPart2(input: string): string[] {
