@@ -10,8 +10,8 @@ The 2025 folder contains TypeScript solutions with Jest tests.
 
 ```
 2025/
-├── fileParser.ts         # Shared runner for all days
 └── day<N>/
+    ├── fileParser.ts     # Day-specific runner
     ├── solution.ts       # Main solution logic
     ├── solution.test.ts  # Jest tests
     ├── data.txt          # Puzzle input (create this file)
@@ -40,14 +40,14 @@ npm test -- day1
 ### Running Solutions Against Puzzle Input
 
 1. Create a `data.txt` file in the day's folder with your puzzle input
-2. Run the shared file parser with the day number:
+2. Run the day-specific file parser:
 
 ```bash
 # Run day 1
-npm run run 2025/fileParser.ts 1
+npm run run 2025/day1/fileParser.ts
 
 # Run day 2
-npm run run 2025/fileParser.ts 2
+npm run run 2025/day2/fileParser.ts
 ```
 
-The shared `fileParser.ts` dynamically loads the solution for the specified day, reads its `data.txt`, and prints the result.
+Each day has its own `fileParser.ts` that handles day-specific input parsing and calls the appropriate solution function.

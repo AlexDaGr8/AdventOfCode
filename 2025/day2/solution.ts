@@ -20,14 +20,44 @@
  *   - 38593856-38593862: 38593859
  */
 
-export function isInvalidId(id: number): boolean {
-  return false;
+export function isInvalidId(id: string): boolean {
+  let right = id.length / 2;
+  let left = 0;
+  while (right < id.length) {
+    if (id[left] !== id[right]) {
+      return false;
+    }
+    left++;
+    right++;
+  }
+
+  return true;
 }
 
-export function findInvalidIds(input: string): number[] {
-  return [];
+export function findInvalidIds(input: string): string[] {
+  // parse a string range
+  let idArray = [];
+  if (input.includes("-")) {
+    const [start, end] = input.split("-").map(Number);
+    for (let i = start; i <= end; i++) {
+      idArray.push(String(i));
+    }
+  } else {
+    idArray.push(input);
+  }
+
+  return idArray.filter(isInvalidId);
 }
 
 export function sumInvalidIds(input: string): number {
-  return 0;
+  // parse input data (a single line of text seperated by commas)
+  const ranges: string[] = input.split(",");
+  let invalidIds: string[] = [];
+  ranges.forEach((range: string) => {
+    const foundInvalidIds: string[] = findInvalidIds(range);
+    invalidIds.push(...foundInvalidIds);
+  });
+  const invalidIdNumbers = invalidIds.map(Number);
+  const sum = invalidIdNumbers.reduce((x, y) => x + y, 0);
+  return sum;
 }
