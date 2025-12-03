@@ -1,7 +1,7 @@
 import parseFile from '../parseFile.js';
 
-const testFile = './day1/test.txt';
-const inputFile = './day1/input.txt';
+const testFile = './test.txt';
+const inputFile = './input.txt';
 
 function splitNumber(num) {
   const dec = (num * .01).toFixed(2);
