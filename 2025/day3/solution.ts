@@ -31,11 +31,13 @@
  * @returns The maximum joltage (2-digit number) that can be produced
  */
 export function findMaxJoltage(bank: string): number {
-  // give the tens digit the first number, ones digit the second number
-  // start iterating at the second number:
-  // if current digit is greater than tens, replace tens digit, make sure that there is at least one number left for the ones digit,
-  //  and use that digit for the new one
-  // if its greater than ones, replace ones, just replace that digit
+  /**
+   *   give the tens digit the first number, ones digit the second number
+   *   start iterating at the second number:
+   *   if current digit is greater than tens, replace tens digit, make sure that there is at least one number left for the ones digit,
+   *   and use that digit for the new one
+   *   if its greater than ones, replace ones, just replace that digit
+   */
   const bankNumbers = Number(bank);
   let tens = Number(bank[0]);
   let ones = Number(bank[1]);
