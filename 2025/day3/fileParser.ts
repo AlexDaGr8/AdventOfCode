@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import { findMaxJoltage, calculateTotalJoltage } from "./solution";
+import { calculateTotalJoltage, calculateTotalJoltage12 } from "./solution";
 
 /**
  * Parses the input file containing battery banks.
@@ -25,8 +25,8 @@ if (part === "1") {
   const result = calculateTotalJoltage(banks);
   console.log("Part 1:", result);
 } else if (part === "2") {
-  // Part 2 solution when available
-  console.log("Part 2: Not implemented yet");
+  const result = calculateTotalJoltage12(banks);
+  console.log("Part 2:", result);
 } else {
   console.log("Usage: npm run run 2025/day3/fileParser.ts [1|2]");
 }
