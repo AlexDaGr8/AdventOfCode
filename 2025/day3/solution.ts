@@ -31,8 +31,32 @@
  * @returns The maximum joltage (2-digit number) that can be produced
  */
 export function findMaxJoltage(bank: string): number {
-  console.log("hello day 3");
-  return 0;
+  // give the tens digit the first number, ones digit the second number
+  // start iterating at the second number:
+  // if current digit is greater than tens, replace tens digit, make sure that there is at least one number left for the ones digit,
+  //  and use that digit for the new one
+  // if its greater than ones, replace ones, just replace that digit
+  const bankNumbers = Number(bank);
+  let tens = Number(bank[0]);
+  let ones = Number(bank[1]);
+  if (tens === undefined || ones === undefined) {
+    return bankNumbers;
+  }
+  const idxMap: Record<number, number> = {};
+  bank.split("").forEach((number, idx) => {
+    idxMap[idx] = Number(number);
+  });
+
+  for (let i = 2; i <= bank.length - 1; i++) {
+    if (idxMap[i] > tens && bank.length - i >= 2) {
+      tens = idxMap[i];
+      ones = 0;
+    } else if (idxMap[i] > ones) {
+      ones = idxMap[i];
+    }
+  }
+
+  return Number(String(tens) + String(ones));
 }
 
 /**
@@ -41,6 +65,9 @@ export function findMaxJoltage(bank: string): number {
  * @returns The total output joltage
  */
 export function calculateTotalJoltage(banks: string[]): number {
-  console.log("hi");
-  return 0;
+  let total = 0;
+  banks.forEach((bank) => {
+    total += findMaxJoltage(bank);
+  });
+  return total;
 }
