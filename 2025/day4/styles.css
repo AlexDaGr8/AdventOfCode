@@ -1,0 +1,75 @@
+:root {
+  --blue: #5774B2;
+  --black: #0A0F0D;
+  --no-roll: #1E1825;
+  --yellow: #F8B225;
+  --purple: #976391;
+  --orange: #D36135;
+  --white: #F4FFF8;
+  --green: #2D4323;
+  --background: var(--green);
+  --color: var(--white);
+}
+
+body {
+  font-family: "Lucida Console", "Courier New", monospace;
+  background: var(--black);
+  color: var(--white);
+}
+
+.layout-grid {
+  width: 95vw;
+  margin: auto;
+  display: grid;
+  gap: 5px;
+  grid-template-columns: 20vw 70vw;
+}
+
+.answer {
+  text-align: center;
+  
+  #answer {
+    font-size: 40px;
+  }
+  #answer-list {
+    font-size: 15px;
+  }
+}
+
+.grid {
+  display: grid;
+  gap: .1px;
+  
+  & div {
+    width: 95%;
+    font-size: 1px;
+    aspect-ratio: 1;
+    text-align: center;
+    display: table-cell;
+    vertical-align: middle;
+    cursor: pointer;
+    background: var(--background);
+    color: var(--color);
+    
+    &.no-roll {
+      --background: var(--no-roll);
+      --color: var(--white);
+    }
+    &.active {
+      --background: var(--yellow);
+      --color: var(--black);
+    }
+    &.found {
+      --background: var(--blue);
+      --color: var(--black);
+    }
+    &.accessable {
+      --background: var(--orange);
+      --color: var(--black);
+      &.found {
+        --background: var(--blue);
+        --color: var(--black);
+      }
+    }
+  }
+}
