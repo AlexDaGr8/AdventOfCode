@@ -18,7 +18,7 @@ import { Interface } from "readline";
  * 45 64 387 23
  * 6 98 215 314
  *
- * - - - -
+ * * + * +
  *
  * Example Output:
  * Problem 1: 123 * 45 * 6 = 33210
@@ -27,6 +27,27 @@ import { Interface } from "readline";
  * Problem 4: 64 + 23 + 314 = 401
  *
  * Grand Total: 33210 + 490 + 4243455 + 401 = 4277556
+ *
+ * Part 2:
+ * - Cephalopod math is written right-to-left in columns
+ * - Each number is given in its own column, with most significant digit at top,
+ *   least significant digit at bottom
+ * - Read problems right-to-left, one column at a time
+ * - The operator is still at the bottom of each problem section
+ *
+ * Example Input (same as Part 1):
+ * 123 328 51 64
+ * 45 64 387 23
+ * 6 98 215 314
+ * *   +   *   +
+ *
+ * Example Output (reading right-to-left, column by column):
+ * Rightmost problem: 4 + 431 + 623 = 1058
+ * Second from right: 175 * 581 * 32 = 3253600
+ * Third from right: 8 + 248 + 369 = 625
+ * Leftmost problem: 356 * 24 * 1 = 8544
+ *
+ * Grand Total: 1058 + 3253600 + 625 + 8544 = 3263827
  */
 export interface workSheet {
   firstNumber: number[];
@@ -93,5 +114,84 @@ export function solvePart1(input: string): number {
     }
   }
 
+  return total;
+}
+
+interface stringWorkSheet {
+  firstNumber: string[];
+  secondNumber: string[];
+  thirdNumber: string[];
+  fourthNumber: string[];
+  sign: string[];
+}
+export function parseInput2(input: string): stringWorkSheet {
+  // loop through the length of a split array (any should do)
+  // if every array's value is ' ', then add an x to the build array
+  const inputArrays = input.split("\n");
+  let first: string = "";
+  let second: string = "";
+  let third: string = "";
+  let fourth: string = "";
+
+  for (let i = 0; i < inputArrays[0].length; i++) {
+    const firstItem = inputArrays[0][i];
+    const secondItem = inputArrays[1][i];
+    const thirdItem = inputArrays[2][i];
+    const fourthItem = inputArrays[3][i];
+    if (
+      firstItem === " " &&
+      secondItem === " " &&
+      thirdItem === " " &&
+      fourthItem === " "
+    ) {
+      first += "x";
+      second += "x";
+      third += "x";
+      fourth += "x";
+    } else {
+      first += firstItem;
+      second += secondItem;
+      third += thirdItem;
+      fourth += fourthItem;
+    }
+  }
+  const firstNumber = first.split("x");
+  const secondNumber = second.split("x");
+  const thirdNumber = third.split("x");
+  const fourthNumber = fourth.split("x");
+
+  return {
+    firstNumber: firstNumber,
+    secondNumber: secondNumber,
+    thirdNumber: thirdNumber,
+    fourthNumber: fourthNumber,
+    sign: inputArrays[4].split(" ").filter((x) => x !== ""),
+  };
+}
+export function solvePart2(input: string): number {
+  const parsedInput: stringWorkSheet = parseInput2(input);
+  let total = 0;
+  for (let i = 0; i < parsedInput.sign.length; i++) {
+    const sign = parsedInput.sign[i];
+    let numbersArray = [];
+    for (let j = 0; j < parsedInput.firstNumber[i].length; j++) {
+      const firstNumber = parsedInput.firstNumber[i][j] ?? "";
+      const secondNumber = parsedInput.secondNumber[i][j] ?? "";
+      const thirdNumber = parsedInput.thirdNumber[i][j] ?? "";
+      const fourthNumber = parsedInput.fourthNumber[i][j] ?? "";
+      numbersArray.push(
+        firstNumber + secondNumber + thirdNumber + fourthNumber
+      );
+    }
+    if (sign === "+") {
+      total += numbersArray
+        .map((i) => Number(i))
+        .reduce((acc, curr) => acc + curr, 0);
+    } else {
+      total += numbersArray
+        .map((i) => Number(i))
+        .reduce((acc, curr) => acc * curr, 1);
+    }
+  }
   return total;
 }
