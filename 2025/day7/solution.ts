@@ -66,7 +66,7 @@ class DiagramSpot {
 
 /**
  * Parse the raw input into a structured representation of the tachyon manifold
- * diagram. This function is intentionally left unimplemented.
+ * diagram.
  */
 export function parseInput(input: string): TachyonManifoldDiagram {
   const rows = input.split("\n");
@@ -100,7 +100,6 @@ export function createLookup(input: TachyonManifoldDiagram) {
 
 /**
  * Solve Part 1 of the puzzle.
- * This function is intentionally left unimplemented.
  */
 export function solvePart1(input: string): number {
   const tachyonDiagram: TachyonManifoldDiagram = parseInput(input);
@@ -147,7 +146,6 @@ export function solvePart1(input: string): number {
  * traversing the manifold, where each splitter causes time to branch into
  * two timelines (one for left path, one for right path).
  *
- * This function is intentionally left unimplemented.
  */
 export function solvePart2(input: string): number {
   /**
