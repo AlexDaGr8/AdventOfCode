@@ -1,0 +1,33 @@
+:root {
+  --blue: #5774B2;
+  --black: #0A0F0D;
+  --grey: #3C3D47;
+  --yellow: #F8B225;
+  --purple: #976391;
+  --orange: #D36135;
+  --white: #F4FFF8;
+  --green: #2D4323;
+  --true: var(--blue);
+  --false: var(--orange);
+  --background: var(--green);
+  --color: var(--white);
+  --max-height: 50vh;
+}
+
+body {
+  font-family: "Lucida Console", "Courier New", monospace;
+  font-weight: bold;
+  background: var(--black);
+  color: var(--white);
+}
+
+.layout-grid {
+  width: 90vw;
+  margin: 5vh auto;
+}
+
+.grid {
+  width: 100%;
+  display: grid;
+  gap: 5px;
+}
