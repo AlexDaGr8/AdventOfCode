@@ -1,0 +1,157 @@
+:root {
+  --blue: #5774B2;
+  --black: #0A0F0D;
+  --grey: #3C3D47;
+  --yellow: #F8B225;
+  --purple: #976391;
+  --orange: #D36135;
+  --white: #F4FFF8;
+  --green: #2D4323;
+  --true: var(--blue);
+  --false: var(--orange);
+  --background: var(--green);
+  --color: var(--white);
+  --max-height: 50vh;
+}
+
+body {
+  font-family: "Lucida Console", "Courier New", monospace;
+  font-weight: bold;
+  background: var(--black);
+  color: var(--white);
+}
+
+.layout-grid {
+  width: 90vw;
+  margin: 5vh auto;
+  padding: 5px 3vw;
+  /* display: grid;
+  gap: 1vw;
+  grid-template-columns: 20vw 69vw; */
+  
+  .answer {
+    background: var(--grey);
+  }
+}
+
+.grid {
+  width: 40vw;
+  /* aspect-ratio: 4/3; */
+  display: grid;
+  gap: 5px;
+  
+  .ingredient {
+    width: 90%;
+    height: 100%;
+    background: var(--background);
+    color: var(--color);
+    padding: 5%;
+    text-align: center;
+    
+    &.rotten {
+        --background: var(--orange);
+        --color: var(--black);
+        #rotten {
+            overflow-y: scroll;
+            max-height: var(--max-height);
+        }
+        .item {
+            font-size: 10px;
+        }
+    }
+    &.check {
+        --background: var(--white);
+        --color: var(--black);
+        
+        & .item {
+            padding: 30px;
+            font-size: 20px;
+        }
+
+        .ingred-list {
+            grid-column: span 3;
+            text-align: center;
+            overflow-y: scroll;
+            max-height: var(--max-height);
+            
+            .item {
+                padding: 0;
+            }
+        }
+    }
+    &.fresh {
+        --background: var(--blue);
+        #fresh {
+            overflow-y: scroll;
+            max-height: var(--max-height);
+        }
+        .item {
+            font-size: 10px;
+        }
+    }
+  }
+}
+
+.carousel {
+  max-width: 40vw;
+  
+  ul {
+    width: 80%;
+    padding-right: 10px;
+    margin: auto;
+    display: flex;
+    gap: 4vw;
+    overflow-x: hidden;
+    scroll-snap-type: x mandatory;
+    anchor-name: --my-carousel;
+    
+    &::scroll-button(*) {
+      border: 0;
+      font-size: 2rem;
+      background: none;
+      color: black;
+      opacity: 0.7;
+      cursor: pointer;
+    }
+    &::scroll-button(*):hover,
+    &::scroll-button(*):focus {
+      opacity: 1;
+    }
+
+    &::scroll-button(*):active {
+      translate: 1px 1px;
+    }
+
+    &::scroll-button(*):disabled {
+      opacity: 0.2;
+      cursor: unset;
+    }
+    &::scroll-button(left) {
+      /* content: "◄"; */
+    }
+    &::scroll-button(right) {
+      /* content: "►"; */
+    }
+    &::scroll-button(*) {
+      position: absolute;
+      position-anchor: --my-carousel;
+    }
+    &::scroll-button(left) {
+      right: calc(anchor(left) - 70px);
+      top: calc(anchor(top) + 9%);
+    }
+
+    &::scroll-button(right) {
+      left: calc(anchor(right) - 70px);
+      top: calc(anchor(top) + 9%);
+    }
+    li {
+      list-style-type: none;
+      background-color: #eeeeee;
+      border: 1px solid #dddddd;
+      scroll-snap-align: center;
+      flex: 0 0 100%;
+      font-size: 10px;
+    }
+  }
+}
